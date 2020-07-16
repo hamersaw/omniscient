@@ -1,23 +1,17 @@
 #!/bin/bash
 
+usage="usage $(basename $0) <monitor-id>
+COMMANDS:
+    help                    display this menu"
+
 # check arguments
-if [ $# != 1 ]; then
-    echo "usage: $(basename $0) <monitor-id>"
-    exit
+if [ $# == 1 ] && [ "$1" == "help" ]; then
+    echo "$usage"
+    exit 0
+elif [ $# != 1 ]; then
+    echo "$usage"
+    exit 1
 fi
-
-# compute project directory and hostfile locations
-scriptdir="$(dirname $0)"
-case $scriptdir in
-  /*) 
-      projectdir="$scriptdir/.."
-      ;;
-  *) 
-      projectdir="$(pwd)/$scriptdir/.."
-      ;;
-esac
-
-hostfile="$projectdir/etc/hosts.txt"
 
 # iterate over hosts
 while read line; do

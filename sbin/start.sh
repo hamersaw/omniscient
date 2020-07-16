@@ -1,31 +1,15 @@
 #!/bin/bash
 
+usage="usage $(basename $0)
+COMMANDS:
+    help                    display this menu"
+
 # check arguments
-if [ $# != 0 ]; then
-    echo "usage: $(basename $0)"
-    exit
-fi
-
-# compute instance variables
-scriptdir="$(dirname $0)"
-case $scriptdir in
-  /*) 
-      projectdir="$scriptdir/.."
-      ;;
-  *) 
-      projectdir="$(pwd)/$scriptdir/.."
-      ;;
-esac
-
-hostfile="$projectdir/etc/hosts.txt"
-
-# set nmon command
-if command -v nmon &> /dev/null; then
-    nmon="nmon"
-elif [ -f "$projectdir/bin/nmon" ]; then
-    nmon="$projectdir/bin/nmon"
-else
-    echo "echo 'nmon' not found"
+if [ $# == 1 ] && [ "$1" == "help" ]; then
+    echo "$usage"
+    exit 0
+elif [ $# != 0 ]; then
+    echo "$usage"
     exit 1
 fi
 
@@ -41,7 +25,7 @@ while read line; do
 
     if [ $host == "127.0.0.1" ]; then
         # start nmon locally
-        $nmon -F $logfile.nmon -c 3600 -s 10 -p > $logfile.pid
+        $nmoncmd -F $logfile.nmon -c 3600 -s 10 -p > $logfile.pid
     else
         echo "TODO - start on remote node"
         # start application on remote host
