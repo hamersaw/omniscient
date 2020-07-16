@@ -13,10 +13,10 @@ elif [ $# != 0 ]; then
     exit 1
 fi
 
-export listfmt="%-12s%-30s%-8s\n"
-listdivlen=50
+export listfmt="%-12s%-30s%-12s%-12s\n"
+listdivlen=66
 
-printf "$listfmt" "host" "id" "status"
+printf "$listfmt" "host" "id" "status" "nmon_size"
 printf "%.0s-" $(seq 1 $listdivlen); printf "\n"
 
 # iterate over hosts

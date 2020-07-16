@@ -6,9 +6,8 @@ if [ $# != 2 ]; then
 fi
 
 # initialize instance variables
-
-basename=$(basename $2)
-monid="${basename%.*}"
+stripped="${2%.*}"
+monid=$(basename $stripped)
 
 # format output
 pid=$(cat $2)
@@ -20,4 +19,6 @@ else
     status="stopped"
 fi
 
-printf "$listfmt" "$1" "$monid" "$status"
+nmonsize=$(stat -c%s "$stripped.nmon")
+
+printf "$listfmt" "$1" "$monid" "$status" "$nmonsize"
