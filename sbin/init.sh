@@ -7,7 +7,7 @@ fi
 
 # ensure nvidia-smi is installed
 if [ -z "$nvidiasmicmd" ]; then
-    echo "FAILURE: nvidia-smi command not found"
+    echo "nvidia-smi command not found"
     exit 1
 fi
 
