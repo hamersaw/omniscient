@@ -13,6 +13,12 @@ elif [ $# != 0 ]; then
     exit 1
 fi
 
+export listfmt="%-12s%-30s%-8s\n"
+listdivlen=50
+
+printf "$listfmt" "host" "id" "status"
+printf "%.0s-" $(seq 1 $listdivlen); printf "\n"
+
 # iterate over hosts
 while read line; do
     # parse host and log directory
@@ -20,8 +26,9 @@ while read line; do
     directory=$(echo $line | awk '{print $2}')
 
     if [ $host == "127.0.0.1" ]; then
-        echo "TODO - list locally"
-        # start nmon locally
+        # list local monitors
+        find $directory -name "*pid" \
+            -exec bash $scriptdir/format.sh "$host" {} \;
     else
         echo "TODO - list on remote node"
         # start application on remote host
