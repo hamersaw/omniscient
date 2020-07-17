@@ -24,3 +24,5 @@ while read line; do
         #ssh rammerd@$host -n "kill `cat $pidfile`; rm $pidfile"
     fi
 done <$hostfile
+
+echo "[/] stopped monitor with id '$1'"

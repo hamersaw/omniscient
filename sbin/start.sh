@@ -18,7 +18,8 @@ while read line; do
 
     if [ $host == "127.0.0.1" ]; then
         # start nmon locally
-        $nmoncmd -F $logfile.nmon -c 3600 -s 5 -p > $logfile.pid
+        $nmoncmd -F $logfile.nmon -c $nmonsnapshots \
+            -s $nmonsnapshotseconds -p > $logfile.pid
     else
         echo "TODO - start on remote node"
         # start application on remote host
@@ -37,4 +38,4 @@ while read line; do
     fi
 done <$hostfile
 
-echo "started with monitor id '$monid'"
+echo "[+] started monitor with id '$monid'"

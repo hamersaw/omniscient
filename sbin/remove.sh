@@ -28,3 +28,5 @@ while read line; do
         # start application on remote host
     fi
 done <$hostfile
+
+echo "[-] removed monitor with id '$1'"

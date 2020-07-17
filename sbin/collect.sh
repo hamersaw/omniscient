@@ -6,7 +6,7 @@ if [ $# != 2 ]; then
     exit 1
 fi
 
-# if doens't exist -> create destination directory
+# if doesn't exist -> create destination directory
 if [ ! -d "$2" ]; then
     mkdir -p "$2"
 fi
@@ -31,6 +31,8 @@ while read line; do
     nodeid=$(( nodeid + 1 ))
 done <$hostfile
 
+echo "[+] downloaded host monitor files"
+
 # convert nmon files to csv
 metricsopts=""
 array=($nmonmetrics)
@@ -43,3 +45,5 @@ for file in $(find $2 -name "*nmon"); do
     
     python3 $scriptdir/nmon2csv.py $file $metricsopts > $outfile
 done
+
+echo "[+] compiled nmon csv metrics"

@@ -1,4 +1,4 @@
-# resource-monitor
+# omniscient
 ## OVERVIEW
 A collection of scripts to facilitate distributed resource monitoring.
 
@@ -9,8 +9,6 @@ TODO
 TODO
 
 ## TODO
-- add 'config' file
 - better list output
 - implement all remote capabilities
 - nvidia-smi support
-- analysis scripts
