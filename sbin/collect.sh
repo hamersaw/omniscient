@@ -1,6 +1,6 @@
 #!/bin/bash
 
-usage="usage $(basename $0) <monitor-id>
+usage="usage $(basename $0) <monitor-id> <dst-directory>
 COMMANDS:
     help            display this menu"
 
@@ -8,12 +8,18 @@ COMMANDS:
 if [ $# == 1 ] && [ "$1" == "help" ]; then
     echo "$usage"
     exit 0
-elif [ $# != 1 ]; then
+elif [ $# != 2 ]; then
     echo "$usage"
     exit 1
 fi
 
+# if doens't exist -> create destination directory
+if [ ! -d "$2" ]; then
+    mkdir -p "$2"
+fi
+
 # iterate over hosts
+nodeid=0
 while read line; do
     # parse host and log directory
     host=$(echo $line | awk '{print $1}')
@@ -22,16 +28,20 @@ while read line; do
     logfile="$directory/$1"
 
     if [ $host == "127.0.0.1" ]; then
-        # list local monitors
-        pid="$(cat $logfile.pid)"
-        if ps -p $pid > /dev/null; then
-            echo "unable to remove running monitor"
-            exit 1
-        else
-            rm $logfile*
-        fi
+        # copy data to collect directory
+        cp $logfile.nmon $2/$nodeid-$host.nmon
     else
         echo "TODO - list on remote node"
         # start application on remote host
     fi
+
+    nodeid=$(( nodeid + 1 ))
 done <$hostfile
+
+# convert nmon files to csv - TODO parameterize data
+for file in $(find $2 -name "*nmon"); do
+    outfile="${file%.*}.csv"
+    
+    python3 $scriptdir/nmon2csv.py $file \
+        -m "CPU_ALL:User%" -m "MEM:active" > $outfile
+done

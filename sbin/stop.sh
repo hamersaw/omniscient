@@ -2,7 +2,7 @@
 
 usage="usage $(basename $0) <monitor-id>
 COMMANDS:
-    help                    display this menu"
+    help            display this menu"
 
 # check arguments
 if [ $# == 1 ] && [ "$1" == "help" ]; then

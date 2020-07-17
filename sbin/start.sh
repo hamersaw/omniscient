@@ -2,7 +2,7 @@
 
 usage="usage $(basename $0)
 COMMANDS:
-    help                    display this menu"
+    help            display this menu"
 
 # check arguments
 if [ $# == 1 ] && [ "$1" == "help" ]; then
@@ -25,7 +25,7 @@ while read line; do
 
     if [ $host == "127.0.0.1" ]; then
         # start nmon locally
-        $nmoncmd -F $logfile.nmon -c 3600 -s 10 -p > $logfile.pid
+        $nmoncmd -F $logfile.nmon -c 3600 -s 5 -p > $logfile.pid
     else
         echo "TODO - start on remote node"
         # start application on remote host

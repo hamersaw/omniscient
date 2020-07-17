@@ -3,13 +3,14 @@
 version="0.1.0"
 usage="usage $(basename $0) <COMMAND> [ARGS...]
 COMMANDS:
-    help                display this menu.
-    init                initialize environment.
-    list                list all monitors.
-    remove              remove a monitor.
-    start               start a monitor.
-    stop                stop a monitor.
-    version             print application version."
+    collect         retrieve and compile monitor results.
+    help            display this menu.
+    init            initialize environment.
+    list            list all monitors.
+    remove          remove a monitor.
+    start           start a monitor.
+    stop            stop a monitor.
+    version         print application version."
 
 # compute instance variables
 basedir="$(dirname $0)"
@@ -38,6 +39,9 @@ fi
 
 # execute command
 case "$1" in
+    collect)
+        $scriptdir/collect.sh ${@:2}
+        ;;
     help)
         echo "$usage"
         ;;
