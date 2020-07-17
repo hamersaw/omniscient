@@ -1,0 +1,1 @@
+export nmonmetrics="CPU_ALL:User% MEM:active"

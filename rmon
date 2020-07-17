@@ -1,16 +1,16 @@
 #!/bin/bash
 
 version="0.1.0"
-usage="usage $(basename $0) <COMMAND> [ARGS...]
+export usage="usage $(basename $0) <COMMAND> [ARGS...]
 COMMANDS:
-    collect         retrieve and compile monitor results.
-    help            display this menu.
-    init            initialize environment.
-    list            list all monitors.
-    remove          remove a monitor.
-    start           start a monitor.
-    stop            stop a monitor.
-    version         print application version."
+    collect <monitor-id> <directory>    retrieve and compile monitor results.
+    help                                display this menu.
+    init                                initialize environment.
+    list                                list all monitors.
+    remove <monitor-id>                 remove a monitor.
+    start                               start a monitor.
+    stop <montior-id>                   stop a monitor.
+    version                             print application version."
 
 # compute instance variables
 basedir="$(dirname $0)"
@@ -25,6 +25,9 @@ esac
 
 export scriptdir="$projectdir/sbin"
 export hostfile="$projectdir/etc/hosts.txt"
+export configfile="$projectdir/etc/config.txt"
+
+source $configfile
 
 # export commands
 if command -v nmon &> /dev/null; then

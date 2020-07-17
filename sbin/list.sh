@@ -1,14 +1,7 @@
 #!/bin/bash
 
-usage="usage $(basename $0)
-COMMANDS:
-    help            display this menu"
-
 # check arguments
-if [ $# == 1 ] && [ "$1" == "help" ]; then
-    echo "$usage"
-    exit 0
-elif [ $# != 0 ]; then
+if [ $# != 0 ]; then
     echo "$usage"
     exit 1
 fi

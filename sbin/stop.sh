@@ -1,14 +1,7 @@
 #!/bin/bash
 
-usage="usage $(basename $0) <monitor-id>
-COMMANDS:
-    help            display this menu"
-
 # check arguments
-if [ $# == 1 ] && [ "$1" == "help" ]; then
-    echo "$usage"
-    exit 0
-elif [ $# != 1 ]; then
+if [ $# != 1 ]; then
     echo "$usage"
     exit 1
 fi

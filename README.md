@@ -10,7 +10,6 @@ TODO
 
 ## TODO
 - add 'config' file
-- introduce 'shift' and 'getopts' into scripts
 - better list output
 - implement all remote capabilities
 - nvidia-smi support

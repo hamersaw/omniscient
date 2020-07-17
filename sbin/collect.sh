@@ -1,14 +1,7 @@
 #!/bin/bash
 
-usage="usage $(basename $0) <monitor-id> <dst-directory>
-COMMANDS:
-    help            display this menu"
-
 # check arguments
-if [ $# == 1 ] && [ "$1" == "help" ]; then
-    echo "$usage"
-    exit 0
-elif [ $# != 2 ]; then
+if [ $# != 2 ]; then
     echo "$usage"
     exit 1
 fi
@@ -38,10 +31,15 @@ while read line; do
     nodeid=$(( nodeid + 1 ))
 done <$hostfile
 
-# convert nmon files to csv - TODO parameterize data
+# convert nmon files to csv
+metricsopts=""
+array=($nmonmetrics)
+for metric in "${array[@]}"; do
+    metricsopts="$metricsopts -m $metric"
+done
+
 for file in $(find $2 -name "*nmon"); do
     outfile="${file%.*}.csv"
     
-    python3 $scriptdir/nmon2csv.py $file \
-        -m "CPU_ALL:User%" -m "MEM:active" > $outfile
+    python3 $scriptdir/nmon2csv.py $file $metricsopts > $outfile
 done
