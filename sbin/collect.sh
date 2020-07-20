@@ -21,11 +21,11 @@ while read line; do
     logfile="$directory/$1"
 
     if [ $host == "127.0.0.1" ]; then
-        # copy data to collect directory
+        # copy local data to collect directory
         cp $logfile.nmon $2/$nodeid-$host.nmon
     else
-        # copy data to collect directory
-        scp $remoteusername@$host $logfile.nmon $2/$nodeid-$host.nmon
+        # copy remote data to collect directory
+        scp $remoteusername@$host:$logfile.nmon $2/$nodeid-$host.nmon
     fi
 
     nodeid=$(( nodeid + 1 ))

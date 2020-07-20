@@ -6,12 +6,6 @@ if [ $# != 0 ]; then
     exit 1
 fi
 
-export listfmt="%-12s%-30s%-12s%-12s\n"
-listdivlen=66
-
-printf "$listfmt" "host" "id" "status" "nmon_size"
-printf "%.0s-" $(seq 1 $listdivlen); printf "\n"
-
 # iterate over hosts
 while read line; do
     # parse host and log directory
@@ -20,9 +14,15 @@ while read line; do
 
     if [ $host == "127.0.0.1" ]; then
         # list local monitors
-        find $directory -name "*pid" \
-            -exec bash $scriptdir/format.sh "$host" {} \;
+        (find $directory -name "*pid" \
+            -exec bash $scriptdir/format.sh "$host" {} \;) &
     else
-        # list all remote monitors
+        # list remote monitors
+        (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
+            find $directory -name "*pid" \
+            -exec "bash $scriptdir/format.sh '$host' {} \;") &
     fi
 done <$hostfile
+
+# wait for all to complete
+wait

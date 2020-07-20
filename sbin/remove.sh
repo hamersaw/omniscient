@@ -15,7 +15,7 @@ while read line; do
     logfile="$directory/$1"
 
     if [ $host == "127.0.0.1" ]; then
-        # start local monitors
+        # remove local monitors
         (rm $logfile*) &
     else
         # remove remote monitors

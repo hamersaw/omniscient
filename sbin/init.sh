@@ -18,8 +18,12 @@ while read line; do
     directory=$(echo $line | awk '{print $2}')
 
     if [ $host == "127.0.0.1" ]; then
-        mkdir -p $directory
+        (mkdir -p $directory) &
     else
-        echo "TODO - mkdir remotely"
+        (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
+           mkdir -p $directory) &
     fi
 done <$hostfile
+
+# wait for all to complete
+wait

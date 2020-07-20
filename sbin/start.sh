@@ -17,14 +17,14 @@ while read line; do
     logfile="$directory/$monid"
 
     if [ $host == "127.0.0.1" ]; then
-        # start nmon locally
+        # start local monitors
         ($nmoncmd -F $logfile.nmon -c $nmonsnapshots \
-            -s $nmonsnapshotseconds -p > $logfile.pid) &
+            -s $nmonsnapshotseconds -p >> $logfile.pid) &
     else
-        # start nmon on remote host
+        # start remote monitors
         (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
-            $nmoncmd -F $logfile.nmon -c $nmonsnapshots \
-            -s $nmonsnapshotseconds -p > $logfile.pid) &
+            "$nmoncmd -F $logfile.nmon -c $nmonsnapshots \
+            -s $nmonsnapshotseconds -p >> $logfile.pid") &
     fi
 done <$hostfile
 

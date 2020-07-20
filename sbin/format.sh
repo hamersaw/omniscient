@@ -20,4 +20,5 @@ fi
 # retrieve file sizes
 nmonsize=$(stat -c%s "$stripped.nmon")
 
-printf "$listfmt" "$1" "$monid" "$status" "$nmonsize"
+# print data to stdout
+echo "$1 : $monid : $status : $nmonsize"
