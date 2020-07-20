@@ -9,5 +9,6 @@ TODO
 TODO
 
 ## TODO
+- download nmon binary
 - nvidia-smi support
 - 'remove' - test if monitor is running

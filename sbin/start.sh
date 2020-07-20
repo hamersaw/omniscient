@@ -6,6 +6,10 @@ if [ $# != 0 ]; then
     exit 1
 fi
 
+# ensure commands are installed
+[ -z "$nmoncmd" ] && echo "nmon command not found" && exit 1
+[ -z "$nvidiasmicmd" ] && echo "nvidia-smi command not found" && exit 1
+
 monid="$USER-$(date +%Y%m%d-%H%M%S)"
 
 # iterate over hosts
