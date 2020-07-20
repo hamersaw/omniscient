@@ -1,4 +1,5 @@
 export nmonmetrics="CPU_ALL:User% MEM:active"
-export nmonsnapshotseconds=3
 export nmonsnapshots=3600
+export nvidiasmimetrics="timestamp uuid utilization.gpu utilization.memory"
 export remoteusername=test
+export snapshotseconds=3

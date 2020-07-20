@@ -12,6 +12,15 @@ fi
 
 monid="$USER-$(date +%Y%m%d-%H%M%S)"
 
+array=($nvidiasmimetrics)
+for metric in "${array[@]}"; do
+	if [ -z "$metricsopts" ]; then
+    	metricsopts="$metric"
+	else
+    	metricsopts="$metricsopts,$metric"
+	fi
+done
+
 # iterate over hosts
 while read line; do
     # parse host and log directory
@@ -23,12 +32,18 @@ while read line; do
     if [ $host == "127.0.0.1" ]; then
         # start local monitors
         ($nmoncmd -F $logfile.nmon -c $nmonsnapshots \
-            -s $nmonsnapshotseconds -p >> $logfile.pid) &
+            	-s $snapshotseconds -p >> $logfile.pid; \
+            $nvidiasmicmd --query-gpu=$metricsopts --format=csv \
+				-l $snapshotseconds >> $logfile.nvidia & 2>&1; \
+			echo $! >> $logfile.pid) &
     else
         # start remote monitors
         (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
             "$nmoncmd -F $logfile.nmon -c $nmonsnapshots \
-            -s $nmonsnapshotseconds -p >> $logfile.pid") &
+                -s $snapshotseconds -p >> $logfile.pid; \
+            $nvidiasmicmd --query-gpu=$metricsopts --format=csv \
+				-l $snapshotseconds >> $logfile.nvidia & 2>&1; \
+			echo $! >> $logfile.pid") &
     fi
 done <$hostfile
 

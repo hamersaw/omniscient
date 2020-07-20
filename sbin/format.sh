@@ -19,6 +19,7 @@ fi
 
 # retrieve file sizes
 nmonsize=$(stat -c%s "$stripped.nmon")
+nvidiasmisize=$(stat -c%s "$stripped.nvidia")
 
 # print data to stdout
-echo "$1 : $monid : $status : $nmonsize"
+echo "$1 : $monid : $status : $nmonsize : $nvidiasmisize"
