@@ -1,3 +1,4 @@
 export nmonmetrics="CPU_ALL:User% MEM:active"
 export nmonsnapshotseconds=3
 export nmonsnapshots=3600
+export remoteusername=test

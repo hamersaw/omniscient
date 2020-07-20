@@ -24,8 +24,8 @@ while read line; do
         # copy data to collect directory
         cp $logfile.nmon $2/$nodeid-$host.nmon
     else
-        echo "TODO - list on remote node"
-        # start application on remote host
+        # copy data to collect directory
+        scp $remoteusername@$host $logfile.nmon $2/$nodeid-$host.nmon
     fi
 
     nodeid=$(( nodeid + 1 ))

@@ -23,7 +23,6 @@ while read line; do
         find $directory -name "*pid" \
             -exec bash $scriptdir/format.sh "$host" {} \;
     else
-        echo "TODO - list on remote node"
-        # start application on remote host
+        # list all remote monitors
     fi
 done <$hostfile

@@ -15,18 +15,16 @@ while read line; do
     logfile="$directory/$1"
 
     if [ $host == "127.0.0.1" ]; then
-        # list local monitors
-        pid="$(cat $logfile.pid)"
-        if ps -p $pid > /dev/null; then
-            echo "unable to remove running monitor"
-            exit 1
-        else
-            rm $logfile*
-        fi
+        # start local monitors
+        (rm $logfile*) &
     else
-        echo "TODO - list on remote node"
-        # start application on remote host
+        # remove remote monitors
+        (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
+            rm $logfile*) &
     fi
 done <$hostfile
+
+# wait for all to complete
+wait
 
 echo "[-] removed monitor with id '$1'"

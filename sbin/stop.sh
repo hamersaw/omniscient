@@ -19,10 +19,13 @@ while read line; do
         # stop local processes
         kill `cat $logfile.pid`
     else
-        echo "TODO"
         # stop node on remote host
-        #ssh rammerd@$host -n "kill `cat $pidfile`; rm $pidfile"
+        (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
+            kill cat $logfile.pid) &
     fi
 done <$hostfile
+
+# wait for all to complete
+wait
 
 echo "[/] stopped monitor with id '$1'"
