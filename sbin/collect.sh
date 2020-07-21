@@ -68,4 +68,8 @@ done <$hostfile
 
 echo "[+] downloaded host monitor files"
 
-# TODO - combine host monitor files
+# combine host monitor files
+python3 $scriptdir/csv-merge.py $2/*nmon.csv > $2/aggregate.nmon.csv
+# TODO - combine nvidia-smi monitor files
+
+echo "[+] combined host monitor files"

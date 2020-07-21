@@ -17,10 +17,8 @@ def process_file(in_file, metrics):
             # if 'out_line' is set -> processing metric reports
             if out_line:
                 print(out_line)
-                #out_file.write(out_line + '\n')
             else:
                 print(header)
-                #out_file.write(header + '\n')
 
             # parse timestamp and add to out_line
             utc_time = datetime.strptime(array[3] + "T" + array[2], \
