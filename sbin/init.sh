@@ -2,7 +2,40 @@
 
 # ensure nmon is installed
 if [ -z "$nmoncmd" ]; then
-    echo "TODO - download nmon binary"
+    downloaddir="/tmp"
+    nmonversion="16j"
+
+    # find release information
+    [ ! -f "/etc/os-release" ] && \
+        echo "failed to find '/etc/os-release' file" && exit 1
+
+    . /etc/os-release
+
+    # download archive
+    wget http://sourceforge.net/projects/nmon/files/nmon$nmonversion.tar.gz \
+        --directory-prefix=$downloaddir
+
+    # extract files
+    mkdir "$downloaddir/nmon-extract"
+    tar xvf "$downloaddir/nmon$version.tar.gz" \
+        -C "$downloaddir/nmon-extract"
+
+    # move binary
+    mkdir $projectdir/bin
+    case "$ID:$VERSION_ID" in
+        fedora:31)
+            mv "$downloaddir/nmon-extract/nmon_x86_rhel75" \
+                "$projectdir/bin/nmon"
+            ;;
+        *)
+            echo "unsupported distribution '$ID:$VERSION_ID'"
+            exit 1
+            ;;
+    esac
+
+    # cleanup
+    rm -r "$downloaddir/nmon-extract"
+    rm "$downloaddir/nmon$version.tar.gz"
 fi
 
 # ensure nvidia-smi is installed
