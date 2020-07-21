@@ -41,9 +41,9 @@ while read line; do
         (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
             "$nmoncmd -F $logfile.nmon -c $nmonsnapshots \
                 -s $snapshotseconds -p >> $logfile.pid; \
-            $nvidiasmicmd --query-gpu=$metricsopts --format=csv \
-				-l $snapshotseconds >> $logfile.nvidia & 2>&1; \
-			echo $! >> $logfile.pid") &
+            nohup $nvidiasmicmd --query-gpu=$metricsopts --format=csv \
+				-l $snapshotseconds >> $logfile.nvidia 2>&1 </dev/null & \
+			echo \$! >> $logfile.pid") &
     fi
 done <$hostfile
 

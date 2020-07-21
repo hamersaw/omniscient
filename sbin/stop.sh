@@ -17,11 +17,11 @@ while read line; do
     #echo "stopping $host"
     if [ $host == "127.0.0.1" ]; then
         # stop local monitors
-        (pkill -F $logfile.pid) &
+        (kill $(cat $logfile.pid)) &
     else
         # stop remote monitors
         (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
-            pkill -F $logfile.pid) &
+            "kill \$(cat $logfile.pid)") &
     fi
 done <$hostfile
 
