@@ -17,7 +17,7 @@ if [ -z "$nmoncmd" ]; then
 
     # extract files
     mkdir "$downloaddir/nmon-extract"
-    tar xvf "$downloaddir/nmon$version.tar.gz" \
+    tar xvf "$downloaddir/nmon$nmonversion.tar.gz" \
         -C "$downloaddir/nmon-extract"
 
     # move binary
@@ -35,7 +35,7 @@ if [ -z "$nmoncmd" ]; then
 
     # cleanup
     rm -r "$downloaddir/nmon-extract"
-    rm "$downloaddir/nmon$version.tar.gz"
+    rm "$downloaddir/nmon$nmonversion.tar.gz"
 fi
 
 # ensure nvidia-smi is installed

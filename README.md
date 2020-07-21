@@ -52,6 +52,5 @@ TODO
 
 ## TODO
 - 'collect' - combine nvidia host monitor files
-- download nmon binary
 - finish 'TIPS' documentation
 - 'remove' - test if monitor is running
