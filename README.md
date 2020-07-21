@@ -12,7 +12,7 @@ TODO
 TODO
 
 ## TODO
-- combine host benchmarks
 - download nmon binary
 - fill out documentation
+- 'collect' - combine host monitor files
 - 'remove' - test if monitor is running
