@@ -39,7 +39,7 @@ while read line; do
 			echo $! >> $logfile.pid) &
     else
         # start remote monitors
-        (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
+        (ssh $host -n -o ConnectTimeout=500 \
             "$nmoncmd -F $logfile.nmon -c $nmonsnapshots \
                 -s $snapshotseconds -p >> $logfile.pid; \
             nohup $nvidiasmicmd --query-gpu=$metricsopts \

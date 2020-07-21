@@ -19,7 +19,7 @@ while read line; do
         (rm $logfile*) &
     else
         # remove remote monitors
-        (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
+        (ssh $host -n -o ConnectTimeout=500 \
             rm $logfile*) &
     fi
 done <$hostfile

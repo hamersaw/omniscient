@@ -4,14 +4,17 @@ A collection of scripts to facilitate distributed resource monitoring.
 
 ## INSTALLATION
 #### configuration
-TODO
+Configuration is performed by editing the files in the 'etc' directory. The files in this directory are:
+
+1. config.txt: This is a simple bash script used to provide easy modification of some variables. In particular, this script configures nmon and nvidia-smi capture metrics and snapshot intervals.
+2. hosts.txt: A file containing cluster host information. Each line is a "ip_address log_directory" pair.
 #### initialization
-Once configuration is complete the installation phase performed using a single command.
+Once configuration is complete the initialization phase is performed using a single command.
 
     # initialize the system
     ./omin init
 
-This command performs a sequence of functionality. (1) Attempts to identify the 'nmon' command in the path. If it doesn't exist, it attempts to download a binary for the given distribution. (2) Ensures the 'nvidia-smi' command is available on the system. If not the initialize step fails. (3) Creates the log directories specified in the configuration on each cluster host.
+This command performs a sequence of events. (1) Attempts to identify the 'nmon' command in the path. If it doesn't exist, it attempts to download a binary for the given distribution. (2) Ensures the 'nvidia-smi' command is available on the system. If not, the initialize step fails. (3) Creates the log directories specified in the configuration on each cluster host.
 
 ## USAGE
 #### start / stop monitor
@@ -48,7 +51,7 @@ Monitors may be deleted using the 'remove' command. Be sure to stop a monitor be
 TODO
 
 ## TODO
-- download nmon binary
-- fill out documentation
 - 'collect' - combine nvidia host monitor files
+- download nmon binary
+- finish 'TIPS' documentation
 - 'remove' - test if monitor is running

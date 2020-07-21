@@ -18,7 +18,7 @@ while read line; do
             -exec bash $scriptdir/format.sh "$host" {} \;) &
     else
         # list remote monitors
-        (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
+        (ssh $host -n -o ConnectTimeout=500 \
             "find $directory -name \"*pid\" \
                 -exec bash $scriptdir/format.sh '$host' {} \;") &
     fi

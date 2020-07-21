@@ -32,7 +32,7 @@ while read line; do
                 > $logfile.nmon.csv) &
     else
         # convert remote nmon to csv
-        (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
+        (ssh $host -n -o ConnectTimeout=500 \
             "[ ! -f \"$logfile.nmon.csv\" ] && \
                 python3 $scriptdir/nmon2csv.py $logfile.nmon $metricsopts \
                     > $logfile.nmon.csv") &
@@ -59,8 +59,8 @@ while read line; do
         cp $logfile.nvidia $2/$nodeid-$host.nvidia
     else
         # copy remote data to collect directory
-        scp $remoteusername@$host:$logfile.nmon.csv $2/$nodeid-$host.nmon.csv
-        scp $remoteusername@$host:$logfile.nvidia $2/$nodeid-$host.nvidia
+        scp $host:$logfile.nmon.csv $2/$nodeid-$host.nmon.csv
+        scp $host:$logfile.nvidia $2/$nodeid-$host.nvidia
     fi
 
     nodeid=$(( nodeid + 1 ))

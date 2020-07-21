@@ -20,7 +20,7 @@ while read line; do
         (kill $(cat $logfile.pid)) &
     else
         # stop remote monitors
-        (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
+        (ssh $host -n -o ConnectTimeout=500 \
             "kill \$(cat $logfile.pid)") &
     fi
 done <$hostfile

@@ -20,7 +20,7 @@ while read line; do
     if [ $host == "127.0.0.1" ]; then
         (mkdir -p $directory) &
     else
-        (ssh $remoteusername@$host -n -o ConnectTimeout=500 \
+        (ssh $host -n -o ConnectTimeout=500 \
            mkdir -p $directory) &
     fi
 done <$hostfile
