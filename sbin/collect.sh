@@ -19,13 +19,9 @@ while read -r LINE; do
 
     LOG_FILE="$DIRECTORY/$1"
 
-    echo "LOG_FILE=$LOG_FILE.nmon"
-    echo "NMON_METRICS=$NMON_METRICS"
-
     if [ "$HOST" == "$(hostname)" ]; then
         # convert local nmon to csv
         ([ ! -f "$LOG_FILE.nmon.csv" ] && \
-            echo -e "Executing: python3 $SCRIPT_DIR/nmon2csv.py $LOG_FILE.nmon --metrics=\"$NMON_METRICS\"" && \
             python3 "$SCRIPT_DIR/nmon2csv.py" "$LOG_FILE.nmon" --metrics="$NMON_METRICS" > "$LOG_FILE.nmon.csv") &
     else
         # convert remote nmon to csv
