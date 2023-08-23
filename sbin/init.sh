@@ -1,62 +1,26 @@
 #!/bin/bash
 
-# ensure nmon is installed
-if [ -z "$nmoncmd" ]; then
-    downloaddir="/tmp"
-    nmonversion="16j"
+OMNI_DIR="$PROJECT_MANAGEMENT/cluster/monitoring/omniscient"
+BIN_DIR="$OMNI_DIR/bin"
 
-    # find release information
-    [ ! -f "/etc/os-release" ] && \
-        echo "failed to find '/etc/os-release' file" && exit 1
-
-    . /etc/os-release
-
-    # download archive
-    wget http://sourceforge.net/projects/nmon/files/nmon$nmonversion.tar.gz \
-        --directory-prefix=$downloaddir
-
-    # extract files
-    mkdir "$downloaddir/nmon-extract"
-    tar xvf "$downloaddir/nmon$nmonversion.tar.gz" \
-        -C "$downloaddir/nmon-extract"
-
-    # move binary
-    mkdir $projectdir/bin
-    case "$ID:$VERSION_ID" in
-        fedora:31)
-            mv "$downloaddir/nmon-extract/nmon_x86_rhel75" \
-                "$projectdir/bin/nmon"
-            ;;
-        *)
-            echo "unsupported distribution '$ID:$VERSION_ID'"
-            exit 1
-            ;;
-    esac
-
-    # cleanup
-    rm -r "$downloaddir/nmon-extract"
-    rm "$downloaddir/nmon$nmonversion.tar.gz"
-fi
-
-# ensure nvidia-smi is installed
-if [ -z "$nvidiasmicmd" ]; then
-    echo "nvidia-smi command not found"
-    exit 1
-fi
-
-# create log directories on each host 
-while read line; do
+# create log directories on each HOST
+while read -r LINE; do
     # parse host and log directory
-    host=$(echo $line | awk '{print $1}')
-    directory=$(echo $line | awk '{print $2}')
+    HOST=$(echo "$LINE" | awk '{print $1}')
+    DIRECTORY=$(echo "$LINE" | awk '{print $2}')
 
-    if [ $host == "127.0.0.1" ]; then
-        (mkdir -p $directory) &
+    if [ "$HOST" == "$(hostname)" ]; then
+        mkdir -p "$DIRECTORY"
+        rm -rf "$BIN_DIR" && mkdir "$BIN_DIR"
+        # Download archived binary for RHEL 8
+        wget https://sourceforge.net/projects/nmon/files/nmon16m_x86_64_rhel8/download --directory-prefix="$BIN_DIR"
+        # Rename binary to "nmon"
+        mv "$BIN_DIR/nmon16m_x86_64_rhel8" "$BIN_DIR/nmon" && chmod +x "$BIN_DIR/nmon"
     else
-        (ssh $host -n -o ConnectTimeout=500 \
-           mkdir -p $directory) &
+        ssh "$HOST" -n -o ConnectTimeout=500 "mkdir -p $DIRECTORY && rm -rf $BIN_DIR && mkdir $BIN_DIR && \
+          wget https://sourceforge.net/projects/nmon/files/nmon16m_x86_64_rhel8/download --directory-prefix=$BIN_DIR && \
+          mv $BIN_DIR/nmon16m_x86_64_rhel8 $BIN_DIR/nmon && chmod +x $BIN_DIR/nmon"
     fi
-done <$hostfile
 
-# wait for all to complete
-wait
+    echo "Finished initializing nmon on $HOST"
+done < "$HOST_FILE"

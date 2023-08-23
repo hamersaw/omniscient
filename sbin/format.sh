@@ -5,30 +5,29 @@ if [ $# != 2 ]; then
     exit 1
 fi
 
-output="$1"
+OUTPUT="$1"
 
 # initialize instance variables
-stripped="${2%.*}"
-monid=$(basename $stripped)
+STRIPPED="${2%.*}"
+MON_ID=$(basename "$STRIPPED")
 
-output="$output : $monid"
+OUTPUT="$OUTPUT : $MON_ID"
 
 # check if processes are running
-while read pid; do
-    if ps -p $pid > /dev/null; then
-        status="running"
+while read -r PID; do
+    if ps -p "$PID" > /dev/null; then
+        STATUS="running"
     else
-        status="stopped"
+        STATUS="stopped"
     fi
         
-    output="$output : $status"
-done <$2
+    OUTPUT="$OUTPUT : $STATUS"
+done < "$2"
 
 # retrieve file sizes
-nmonsize=$(stat -c%s "$stripped.nmon")
-nvidiasmisize=$(stat -c%s "$stripped.nvidia")
+NMON_SIZE=$(stat -c%s "$STRIPPED.nmon")
 
-output="$output : $nmonsize : $nvidiasmisize"
+OUTPUT="$OUTPUT : $NMON_SIZE"
 
 # print data to stdout
-echo "$output"
+echo "$OUTPUT"

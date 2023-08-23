@@ -2,54 +2,34 @@
 
 # check arguments
 if [ $# != 0 ]; then
-    echo "$usage"
+    echo "$USAGE"
     exit 1
 fi
 
 # ensure commands are installed
-[ -z "$nmoncmd" ] && echo "nmon command not found" && exit 1
-[ -z "$nvidiasmicmd" ] && echo "nvidia-smi command not found" && exit 1
+[ -z "$NMON_CMD" ] && echo "nmon command not found" && exit 1
 
-monid="$USER-$(date +%Y%m%d-%H%M%S)"
-
-array=($nvidiasmimetrics)
-for metric in "${array[@]}"; do
-	if [ -z "$metricsopts" ]; then
-    	metricsopts="$metric"
-	else
-    	metricsopts="$metricsopts,$metric"
-	fi
-done
+MON_ID="$USER-$(date +%Y%m%d-%H%M%S)"
 
 # iterate over hosts
-while read line; do
+while read -r LINE; do
     # parse host and log directory
-    host=$(echo $line | awk '{print $1}')
-    directory=$(echo $line | awk '{print $2}')
+    HOST=$(echo "$LINE" | awk '{print $1}')
+    DIRECTORY=$(echo "$LINE" | awk '{print $2}')
 
-    logfile="$directory/$monid"
+    LOG_FILE="$DIRECTORY/$MON_ID"
+    echo "$HOST: Creating log file $LOG_FILE.nmon and pidfile $LOG_FILE.pid"
 
-    if [ $host == "127.0.0.1" ]; then
+    if [ "$HOST" == "$(hostname)" ]; then
         # start local monitors
-        ($nmoncmd -F $logfile.nmon -c $nmonsnapshots \
-            	-s $snapshotseconds -p >> $logfile.pid; \
-            $nvidiasmicmd --query-gpu=$metricsopts \
-                --format=csv,nounits -l $snapshotseconds \
-                    >> $logfile.nvidia & 2>&1; \
-			echo $! >> $logfile.pid) &
+        ("$NMON_CMD" -F "$LOG_FILE.nmon" -c "$NMON_SNAPSHOTS" -s "$SNAPSHOT_SECONDS" -p >> "$LOG_FILE.pid") &
     else
         # start remote monitors
-        (ssh $host -n -o ConnectTimeout=500 \
-            "$nmoncmd -F $logfile.nmon -c $nmonsnapshots \
-                -s $snapshotseconds -p >> $logfile.pid; \
-            nohup $nvidiasmicmd --query-gpu=$metricsopts \
-                --format=csv,nounits -l $snapshotseconds \
-                    >> $logfile.nvidia 2>&1 </dev/null & \
-			echo \$! >> $logfile.pid") &
+        (ssh "$HOST" -n -o ConnectTimeout=500 "$NMON_CMD -F $LOG_FILE.nmon -c $NMON_SNAPSHOTS -s $SNAPSHOT_SECONDS -p >> $LOG_FILE.pid") &
     fi
-done <$hostfile
+done < "$HOST_FILE"
 
 # wait for all to complete
 wait
 
-echo "[+] started monitor with id '$monid'"
+echo "[+] started monitor with id '$MON_ID'"

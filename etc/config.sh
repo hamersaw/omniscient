@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Metrics
+export NMON_METRICS="CPU_ALL:User% CPU_ALL:Sys% DISKBUSY:nvme0n1 DISKREAD:nvme0n1 DISKWRITE:nvme0n1"
+export NMON_SNAPSHOTS=30
+export SNAPSHOT_SECONDS=1

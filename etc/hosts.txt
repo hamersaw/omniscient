@@ -1,3 +1,1 @@
-127.0.0.1 /home/hamersaw/Downloads/omni/0
-127.0.0.1 /home/hamersaw/Downloads/omni/1
-127.0.0.1 /home/hamersaw/Downloads/omni/2
+n01 /home/users/ccarlson/omniscient

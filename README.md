@@ -1,56 +1,145 @@
-# omniscient
-## OVERVIEW
-A collection of scripts to facilitate distributed resource monitoring.
+# Omniscient
 
-## INSTALLATION
-#### configuration
-Configuration is performed by editing the files in the 'etc' directory. The files in this directory are:
+A collection of scripts to facilitate distributed resource monitoring. This is a modified version of 
+[hamersaw/omniscient](https://github.com/hamersaw/omniscient); credit goes to [Dan Rammer](https://github.com/hamersaw)
+for authoring the original version.
 
-1. config.txt: This is a simple bash script used to provide easy modification of some variables. In particular, this script configures nmon and nvidia-smi capture metrics and snapshot intervals.
-2. hosts.txt: A file containing cluster host information. Each line is a "ip_address log_directory" pair.
-#### initialization
-Once configuration is complete the initialization phase is performed using a single command.
+The tool uses the [nmon](https://nmon.sourceforge.io/pmwiki.php) binary to capture stats for many different metrics, 
+like CPU usage, network usage, disk I/O, etc.
 
-    # initialize the system
-    ./omin init
+## Installation
 
-This command performs a sequence of events. (1) Attempts to identify the 'nmon' command in the path. If it doesn't exist, it attempts to download a binary for the given distribution. (2) Ensures the 'nvidia-smi' command is available on the system. If not, the initialize step fails. (3) Creates the log directories specified in the configuration on each cluster host.
+### Configuration
 
-## USAGE
-#### start / stop monitor
-Starting and stopping monitors is performed by contacted each node defined in the configuration. Both the nmon and nvidia-smi monitors are handled with a single call.
+Configuration is performed by editing the files in the [etc/](etc) directory. The files in this directory are:
 
-    # start monitors based on configuration
-    ./omni start
+1. [**config.sh**](etc/config.sh): This is a simple bash script used to export and provide easy modification of configuration variables.
+   * `NMON_METRICS`: Space-separated list of metrics to capture with `nmon`.
+   * `NMON_SNAPSHOTS`: How many snapshots to take of the system before terminating.
+   * `SNAPSHOT_SECONDS`: Interval between snapshots (in seconds).
+2. [**hosts.txt**](etc/hosts.txt): A file containing cluster host information. Each line is a `hostname log_directory` pair.
+   * `log_directory` is the local directory on the machines you're monitoring where you wish to store the monitoring output. 
+     A good value for this is `/tmp/omniscient`. These logs will be collected after monitoring is completed and aggregated to 
+     a single location for post-processing.
 
-    # stop the monitor with id 'rammerd-20200720-214623'
-    ./omni stop rammerd-20200720-214623
-#### list monitors
-Listing all available monitors is performed with this command. The output format is 'host : monitor-id : nmon-status : nvidia-smi-status : nmon-size : nvidia-smi-size'.
+## Usage
 
-    # list all cluster monitors
-    ./omni list
-#### collect monitors
-Analysis over monitor data requires a sequence of manipulation and aggregation. The 'collect' command transforms data to a common format, downloads it to the specified directory, and aggregates values from each cluster host. The results are stored in multiple files:
+### Start Monitor
 
-- \*.nmon.csv: csv formatted nmon output for each individual host 
-- \*.nvidia: csv formatted nvidia-smi output for each individual host 
-- aggregate.nmon.csv: aggregated nmon csv files
+Launch a monitor by running:
 
-    # collect monitors with id 'rammerd-20200720-214623' 
-    #  in the 'data' directory
-    ./omni collect rammerd-20200720-214623 data/
-#### remove monitor
-Monitors may be deleted using the 'remove' command. Be sure to stop a monitor before it is removed, less it will execute indefinitely unless manually stopped.
+```bash
+omni start
+```
 
-    # remove monitor with id 'rammerd-20200720-214623'
-    ./omni remove rammerd-20200720-214623'
+Starting monitors is performed by remotely SSHing into each node and launching the monitor binaries. Example:
 
-## TIPS
-#### ssh public key authentication
-TODO
+```console
+[ccarlson@n01 omniscient]$ ./omni start
+n01: Creating log file /home/users/ccarlson/omniscient/ccarlson-20230822-163709.nmon and pidfile /home/users/ccarlson/omniscient/ccarlson-20230822-163709.pid
+[+] started monitor with id 'ccarlson-20230822-163709'
+```
 
-## TODO
-- 'collect' - combine nvidia host monitor files
-- finish 'TIPS' documentation
-- 'remove' - test if monitor is running
+> *Take note of the monitor id that was generated; you'll need this to stop the monitor.*
+
+### Synopsis
+
+Use `omni help` to view a synopsis:
+
+```console
+USAGE omni <COMMAND> [ARGS...]
+COMMANDS:
+    collect <monitor-id> <directory>    retrieve and compile monitor results.
+    help                                display this menu.
+    init                                initialize environment DEPRECATED.
+    list                                list all monitors.
+    remove <monitor-id>                 remove a monitor.
+    start                               start a monitor.
+    stop <monitor-id>                   stop a monitor.
+    cleanup                             clean up omni logs/directories.
+    version                             print application version.
+```
+
+### Listing Monitors
+
+List running and stopped monitors:
+
+```bash
+omni list
+```
+
+Example:
+
+```console
+[ccarlson@n01 omniscient]$ ./omni list
+n01 : ccarlson-20230823-110229 : running : 336922
+```
+
+### Stopping Monitor
+
+Stop a running monitor by referencing its monitor id:
+
+```bash
+omni stop <monitor_id>
+```
+Example:
+
+```console
+[ccarlson@n01 omniscient]$ ./omni stop ccarlson-20230823-110507
+stopping n01
+[/] stopped monitor with id 'ccarlson-20230823-110507'
+```
+
+> *You can use this to stop a monitor before it has completed all its snapshots.*
+
+## Collecting Monitor Data
+
+After the monitors have been stopped, they will have left `.nmon` output files
+in their local directories specified by the `hosts.txt` file. As it stands, these files
+are very data rich and need to be processed and aggregated to provide more concise
+metrics before we try to analyze them with Python or other tools.
+
+To do this, use:
+
+```bash
+omni collect <monitor_id> <output_directory>
+```
+
+Example:
+
+```console
+[ccarlson@n01 omniscient]$ ./omni collect ccarlson-20230823-110229 $HOME/omniscient/benchmark_1_results
+[+] compiled nmon csv files
+[+] downloaded host monitor files
+[+] combined host monitor files
+```
+
+This will create the directory `benchmark_1_results/` with a `.csv` file for
+each of the monitors, and an aggregated `.csv` file with all the combined data.
+
+### Remove Monitor
+
+Monitors may be deleted using the `remove` command:
+
+```bash
+omni remove <monitor_id>
+```
+
+Example:
+
+```console
+[ccarlson@n01 omniscient]$ ./omni remove ccarlson-20230823-110229
+[-] removed monitor with id 'ccarlson-20230823-110229'
+```
+
+Be sure to stop a monitor before it is removed, less 
+it will execute indefinitely unless manually stopped.
+
+### Cleanup
+
+To remove all the `.pid`, `.nmon`, and `.nmon.csv` files created by Omniscient in each
+of the monitors log directories:
+
+```bash
+omni cleanup
+```

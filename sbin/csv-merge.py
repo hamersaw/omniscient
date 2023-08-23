@@ -3,9 +3,10 @@
 import argparse
 import sys
 
-def next_record(file):
+
+def next_record(input_file):
     # read line from file
-    line = file.readline()        
+    line = input_file.readline()
     if not line:
         return None
 
@@ -17,9 +18,11 @@ def next_record(file):
 
     return record
 
-def next_record_all(files):
+
+def next_record_all(input_files):
+    print(f"DEBUG: input_files={input_files}")
     data = []
-    for file in files:
+    for file in input_files:
         # parse next record
         record = next_record(file)
         if record == None:
@@ -30,26 +33,26 @@ def next_record_all(files):
 
     return data
 
+
 if __name__ == '__main__':
     # parse arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument('files', metavar='FILES', nargs='+',
-        help='list of input csv files.')
+    parser.add_argument('files', metavar='FILES', nargs='+', help='list of input csv files.')
     args = parser.parse_args()
 
     # iterate over all files in arg.files
     files = []
-    headerstr = ''
+    header_str = ''
     for filename in args.files:
         # open input and output files
         file = open(filename, 'r')
 
         # validate file header
         line = file.readline()
-        if not headerstr:
-            headerstr = line
+        if not header_str:
+            header_str = line
         else:
-            if line != headerstr:
+            if line != header_str:
                 print('headers do not match')
                 sys.exit(1)
 
@@ -71,8 +74,7 @@ if __name__ == '__main__':
             for j in range(len(record)):
                 record[j] = new_record[j]
 
-    #print(data)
-    print('record,' + headerstr.rstrip())
+    print('record,' + header_str.rstrip())
     aggregate_values = []
 
     record_num = 0
@@ -85,9 +87,9 @@ if __name__ == '__main__':
                 for value in record:
                     aggregate_values.append(value)
             else:
-                # incrememt values (skipping timestamp)
+                # increment values (skipping timestamp)
                 for j, value in enumerate(record[1:]):
-                    aggregate_values[j+1] += value
+                    aggregate_values[j + 1] += value
 
         # print line of aggregate values
         line = str(record_num) + ',' + str(int(aggregate_values[0]))
@@ -98,9 +100,9 @@ if __name__ == '__main__':
         # retrieve next record from each file
         data = next_record_all(files)
         record_num += 1
-        if data == None:
+        if data is None:
             break
-    
+
     # close all files
     for file in files:
         file.close()

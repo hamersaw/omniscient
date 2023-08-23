@@ -2,7 +2,7 @@
 
 # check arguments
 if [ $# != 2 ]; then
-    echo "$usage"
+    echo "$USAGE"
     exit 1
 fi
 
@@ -11,33 +11,30 @@ if [ ! -d "$2" ]; then
     mkdir -p "$2"
 fi
 
-metricsopts=""
-array=($nmonmetrics)
-for metric in "${array[@]}"; do
-    metricsopts="$metricsopts -m $metric"
-done
-
 # iterate over hosts
-while read line; do
+while read -r LINE; do
     # parse host and log directory
-    host=$(echo $line | awk '{print $1}')
-    directory=$(echo $line | awk '{print $2}')
+    HOST=$(echo "$LINE" | awk '{print $1}')
+    DIRECTORY=$(echo "$LINE" | awk '{print $2}')
 
-    logfile="$directory/$1"
+    LOG_FILE="$DIRECTORY/$1"
 
-    if [ $host == "127.0.0.1" ]; then
+    echo "LOG_FILE=$LOG_FILE.nmon"
+    echo "NMON_METRICS=$NMON_METRICS"
+
+    if [ "$HOST" == "$(hostname)" ]; then
         # convert local nmon to csv
-        ([ ! -f "$logfile.nmon.csv" ] && \
-            python3 $scriptdir/nmon2csv.py $logfile.nmon $metricsopts \
-                > $logfile.nmon.csv) &
+        ([ ! -f "$LOG_FILE.nmon.csv" ] && \
+            echo -e "Executing: python3 $SCRIPT_DIR/nmon2csv.py $LOG_FILE.nmon --metrics=\"$NMON_METRICS\"" && \
+            python3 "$SCRIPT_DIR/nmon2csv.py" "$LOG_FILE.nmon" --metrics="$NMON_METRICS" > "$LOG_FILE.nmon.csv") &
     else
         # convert remote nmon to csv
-        (ssh $host -n -o ConnectTimeout=500 \
-            "[ ! -f \"$logfile.nmon.csv\" ] && \
-                python3 $scriptdir/nmon2csv.py $logfile.nmon $metricsopts \
-                    > $logfile.nmon.csv") &
+        (ssh "$HOST" -n -o ConnectTimeout=500 \
+            "[ ! -f \"$LOG_FILE.nmon.csv\" ] && \
+                python3 $SCRIPT_DIR/nmon2csv.py $LOG_FILE.nmon --metrics=\"$NMON_METRICS\" \
+                    > $LOG_FILE.nmon.csv") &
     fi
-done <$hostfile
+done < "$HOST_FILE"
 
 # wait for all to complete
 wait
@@ -45,31 +42,28 @@ wait
 echo "[+] compiled nmon csv files"
 
 # iterate over hosts
-nodeid=0
-while read line; do
+NODE_ID=0
+while read -r LINE; do
     # parse host and log directory
-    host=$(echo $line | awk '{print $1}')
-    directory=$(echo $line | awk '{print $2}')
+    HOST=$(echo "$LINE" | awk '{print $1}')
+    DIRECTORY=$(echo "$LINE" | awk '{print $2}')
 
-    logfile="$directory/$1"
+    LOG_FILE="$DIRECTORY/$1"
 
-    if [ $host == "127.0.0.1" ]; then
+    if [ "$HOST" == "$(hostname)" ]; then
         # copy local data to collect directory
-        cp $logfile.nmon.csv $2/$nodeid-$host.nmon.csv
-        cp $logfile.nvidia $2/$nodeid-$host.nvidia
+        cp "$LOG_FILE.nmon.csv" "$2/$NODE_ID-$HOST.nmon.csv"
     else
         # copy remote data to collect directory
-        scp $host:$logfile.nmon.csv $2/$nodeid-$host.nmon.csv
-        scp $host:$logfile.nvidia $2/$nodeid-$host.nvidia
+        scp "$HOST:$LOG_FILE.nmon.csv" "$2/$NODE_ID-$HOST.nmon.csv"
     fi
 
-    nodeid=$(( nodeid + 1 ))
-done <$hostfile
+    NODE_ID=$(( NODE_ID + 1 ))
+done < "$HOST_FILE"
 
 echo "[+] downloaded host monitor files"
 
 # combine host monitor files
-python3 $scriptdir/csv-merge.py $2/*nmon.csv > $2/aggregate.nmon.csv
-# TODO - combine nvidia-smi monitor files
+python3 "$SCRIPT_DIR/csv-merge.py" "$2"/*nmon.csv > "$2/aggregate.nmon.csv"
 
 echo "[+] combined host monitor files"

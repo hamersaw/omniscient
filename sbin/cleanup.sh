@@ -12,14 +12,13 @@ while read -r LINE; do
     HOST=$(echo "$LINE" | awk '{print $1}')
     DIRECTORY=$(echo "$LINE" | awk '{print $2}')
 
+    echo "$HOST: Cleaning up directory $DIRECTORY"
+
     if [ "$HOST" == "$(hostname)" ]; then
-        # list local monitors
-        (find "$DIRECTORY" -name "*pid" -exec bash "$SCRIPT_DIR/format.sh" "$HOST" {} \;) &
+        # clean up local monitors
+        rm "$DIRECTORY"/*.nmon $DIRECTORY/*.nmon.csv $DIRECTORY/*.pid
     else
-        # list remote monitors
-        (ssh "$HOST" -n -o ConnectTimeout=500 "find $DIRECTORY -name \"*pid\" -exec bash $SCRIPT_DIR/format.sh '$HOST' {} \;") &
+        # clean up remote monitors
+        ssh "$HOST" -n -o ConnectTimeout=500 "rm $DIRECTORY/*.nmon $DIRECTORY/*.nmon.csv $DIRECTORY/*.pid"
     fi
 done < "$HOST_FILE"
-
-# wait for all to complete
-wait

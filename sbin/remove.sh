@@ -2,27 +2,26 @@
 
 # check arguments
 if [ $# != 1 ]; then
-    echo "$usage"
+    echo "$USAGE"
     exit 1
 fi
 
 # iterate over hosts
-while read line; do
+while read -r LINE; do
     # parse host and log directory
-    host=$(echo $line | awk '{print $1}')
-    directory=$(echo $line | awk '{print $2}')
+    HOST=$(echo "$LINE" | awk '{print $1}')
+    DIRECTORY=$(echo "$LINE" | awk '{print $2}')
 
-    logfile="$directory/$1"
+    LOG_FILE="$DIRECTORY/$1"
 
-    if [ $host == "127.0.0.1" ]; then
+    if [ "$HOST" == "$(hostname)" ]; then
         # remove local monitors
-        (rm $logfile*) &
+        (rm "$LOG_FILE"*) &
     else
         # remove remote monitors
-        (ssh $host -n -o ConnectTimeout=500 \
-            rm $logfile*) &
+        (ssh "$HOST" -n -o ConnectTimeout=500 "rm $LOG_FILE*") &
     fi
-done <$hostfile
+done < "$HOST_FILE"
 
 # wait for all to complete
 wait
