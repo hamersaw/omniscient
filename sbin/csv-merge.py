@@ -37,7 +37,9 @@ def next_record_all(input_files):
 if __name__ == '__main__':
     # parse arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument('files', metavar='FILES', nargs='+', help='list of input csv files.')
+    parser.add_argument(
+        'files', metavar='FILES', nargs='+', help='list of input csv files.'
+    )
     args = parser.parse_args()
 
     # iterate over all files in arg.files
